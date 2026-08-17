@@ -1,0 +1,34 @@
+id: spartans-market-P0-abnormal-return-rate-cross-page-consistency
+title: 同一机器人同周期收益率在市集卡片和详情页应完全一致
+module: spartans / market
+priority: P0
+type: 异常
+preconditions:
+  - 已进入策略市集 /zh-cn/spartans-all
+  - 至少存在 1 个"战斗中"机器人
+data:
+  period: 30d
+  bot_name: <choose_first_bot_in_market>
+steps:
+  - action: 记录市集卡片上 {bot_name} 的 {period} 收益率数值 X
+  - action: 点击卡片进入详情页
+    path: /zh-cn/spartan-bot/{bot_name}
+  - action: 记录详情页顶部 {period} 收益率数值 Y
+  - action: 打开浏览器 DevTools 抓取两个接口返回值 A（市集）、B（详情）
+expected:
+  - X 与 Y 数值完全一致（含小数位）
+  - A 与 B 中 {period} 收益率字段值完全一致
+  - 如果存在合理时间差（例如缓存 5min 刷新），差值必须能从接口 metadata（updated_at）解释
+edge_cases:
+  - 7d / 30d / 90d 三个周期分别验证
+  - 切换语言后再验证
+  - 移动端 App 与 Web 同一时刻对比
+notes:
+  - 来源：Vegeta 走查发现 V2 - 首页卡片与详情页同周期收益率差 0.3%
+  - 数据口径不一致直接影响用户对策略的排序判断，属数据准确性问题
+source:
+  from: walkthrough
+  ref: projects/spartans/bots/examples/Vegeta-subscribe-walkthrough.md#问题-V2
+generated_by: ai-testlab/skills/testcase-generator
+reviewed_by: <待人工填写>
+version: 1

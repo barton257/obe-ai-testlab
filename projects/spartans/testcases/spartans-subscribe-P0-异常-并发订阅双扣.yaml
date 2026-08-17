@@ -1,0 +1,38 @@
+id: spartans-subscribe-P0-abnormal-concurrent-double-charge
+title: 同一机器人并发订阅不应导致双扣或数据不一致
+module: spartans / subscribe
+priority: P0
+type: 异常
+preconditions:
+  - 账号已登录（订阅者 A）
+  - 可用 USDT 余额 = <2 * subscribe_amount>
+  - 目标机器人处于"战斗中"状态
+data:
+  bot_name: OBE-Jason
+  subscribe_amount: <min_subscribe_amount_from_config>
+steps:
+  - action: 打开机器人详情页
+    path: /zh-cn/spartan-bot/{bot_name}
+  - action: 在浏览器 Tab1 打开订阅弹窗，输入金额并勾选风险披露（暂不提交）
+  - action: 在浏览器 Tab2 打开同一机器人的订阅弹窗，输入相同金额并勾选风险披露
+  - action: 使用脚本或手动在极短时间内（<200ms）同时点击 Tab1 和 Tab2 的"确认"
+expected:
+  - 至多一笔订阅成功，另一笔应返回明确错误（幂等冲突 / 状态锁）
+  - 可用 USDT 余额只扣一份 <subscribe_amount>
+  - "我的订阅" > "操作记录"中最多出现一条对应订阅记录（或两条中一条状态为"失败"）
+  - 后端接口对相同幂等键返回相同结果，不重复扣款
+cleanup:
+  - 撤销成功的订阅（若允许）或等待赎回窗口清理
+edge_cases:
+  - 不同浏览器（Chrome + Safari）并发
+  - 前后端时钟不同步时的行为
+  - 提交后立即断网，重发请求
+notes:
+  - 来源：Vegeta 走查发现 V5 - 并发提交双扣但数据不一致
+  - 需前后端都实现幂等：请求头带 Idempotency-Key，服务端按 (user_id + bot_id + key) 加锁
+source:
+  from: walkthrough
+  ref: projects/spartans/bots/examples/Vegeta-subscribe-walkthrough.md#问题-V5
+generated_by: ai-testlab/skills/testcase-generator
+reviewed_by: <待人工填写>
+version: 1

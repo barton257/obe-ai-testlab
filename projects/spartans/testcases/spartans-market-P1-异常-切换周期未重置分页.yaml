@@ -1,0 +1,33 @@
+id: spartans-market-P1-abnormal-period-switch-not-reset-page
+title: 策略市集切换周期后应自动回到第 1 页
+module: spartans / market
+priority: P1
+type: 异常
+preconditions:
+  - 已进入策略市集 /zh-cn/spartans-all
+  - 当前列表至少 3 页（若不足则先调整每页数量）
+data:
+  initial_period: 30d
+  target_period: 7d
+steps:
+  - action: 在市集列表底部点击第 3 页
+  - action: 观察当前分页指示器为 "3 / N"
+  - action: 在工具栏切换周期为 {target_period}
+  - action: 观察分页指示器
+expected:
+  - 分页自动回到第 1 页
+  - 卡片数据按新周期 {target_period} 重新计算并按当前排序字段展示前 12 条
+  - URL 中的 page 参数（若有）同步更新为 1
+edge_cases:
+  - 切换周期时同时改变排序字段
+  - 已带 URL page=3 直接进入页面再切换
+  - 搜索关键词非空时切换周期
+notes:
+  - 来源：Vegeta 走查发现 V1 - 切换周期后未重置到第 1 页
+  - 用户在旧分页上看新数据会引发排名解读错误
+source:
+  from: walkthrough
+  ref: projects/spartans/bots/examples/Vegeta-subscribe-walkthrough.md#问题-V1
+generated_by: ai-testlab/skills/testcase-generator
+reviewed_by: <待人工填写>
+version: 1
