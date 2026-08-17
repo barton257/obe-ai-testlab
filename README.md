@@ -45,6 +45,10 @@ obe-ai-testlab/
 
 每个一级目录下有独立 `README.md` 说明用途和示例，进入子目录前请先读。
 
+## AI 技能清单
+
+已装备的 skill 见 [`ai-testlab/skills/README.md`](ai-testlab/skills/README.md) — 含用途、输入输出、落点、当前案例数、触发场景速查。
+
 ## 分层原则
 
 | 判断 | 放哪 |
