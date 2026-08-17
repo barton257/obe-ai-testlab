@@ -11,3 +11,8 @@ obe-ai-product-workflow/
 
 # Claude Code 本地设置
 .claude/settings.local.json
+
+# 本地凭证（绝不入库）
+.env.local
+*.env.local
+shared/secrets/*.env.local
