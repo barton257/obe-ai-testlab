@@ -1,0 +1,35 @@
+id: spartans-subscribe-P0-normal-min-amount
+title: 订阅最小金额校验
+module: spartans / subscribe
+priority: P0
+type: 正常
+preconditions:
+  - 账号已登录（订阅者 A）
+  - 可用 USDT 余额 >= 最小订阅金额
+  - 目标机器人处于"战斗中"状态
+data:
+  bot_name: OBE-Jason
+  amount: <min_subscribe_amount_from_config>
+steps:
+  - action: 打开机器人详情页
+    path: /zh-cn/spartan-bot/{bot_name}
+  - action: 点击"订阅"按钮
+  - action: 在弹窗中输入订阅金额
+  - action: 勾选"我已阅读并同意 300 SPARTANS 风险披露"
+  - action: 点击"确认"
+expected:
+  - 提交成功，弹窗关闭
+  - Toast 提示"订阅已提交，将在下一次开放窗口处理"
+  - "我的订阅" -> "操作记录"出现新条目：类型=订阅 {bot_name}，金额=负数
+  - 可用 USDT 余额扣减对应金额
+edge_cases:
+  - 金额低于最小值 -> 确认按钮禁用
+  - 未勾选风险披露 -> 确认按钮禁用
+  - 余额不足 -> 显示"余额不足"并跳转充值
+notes:
+  - 最小金额受运营配置控制，用 <placeholder> 不写死
+  - 订阅不会立即执行；本用例只验证提交阶段
+  - 断言资金变化时排除同期其它订阅/赎回干扰
+generated_by: manual
+reviewed_by: barton257
+version: 1
