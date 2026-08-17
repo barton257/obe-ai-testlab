@@ -2,6 +2,10 @@
 
 空白骨架模板。skill 输出前先套模板，保证结构一致。
 
+## 已有
+
+- [`TEST_STRATEGY.md`](TEST_STRATEGY.md) — 测试策略文档骨架，`test-strategy-generator` skill 输出前套此模板
+
 ## 建议模板
 
 - `testcase.yaml` — 用例骨架（与 AGENTS.md 第四节一致）

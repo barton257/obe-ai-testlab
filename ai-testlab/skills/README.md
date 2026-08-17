@@ -6,6 +6,7 @@
 
 | Skill | 用途 | 输入 | 输出 | 落点目录 |
 |---|---|---|---|---|
+| [test-strategy-generator](test-strategy-generator/) | 需求 → 完整测试策略（六问 + 矩阵 + 六层 + 非功能 + DoD 映射） | PRD、走查、变更点、审计报告 | `_TEST_STRATEGY.md` | `projects/<x>/docs/` |
 | [testcase-generator](testcase-generator/) | 从走查/需求生成结构化 YAML 用例 | 走查产出、审计报告、需求 | `.yaml` 用例文件 | `projects/<x>/testcases/` |
 | [bug-writer](bug-writer/) | 现场描述转标准化缺陷报告 | 口述、截图、日志 | `.md` 缺陷文件 | `projects/<x>/bugs/` |
 | [walkthrough-recorder](walkthrough-recorder/) | 走查过程整理为审计报告 | 流水、笔记、录音字幕 | `_WALKTHROUGH.md` | `projects/<x>/docs/` |
@@ -16,6 +17,7 @@
 
 | Skill | prompt.md | cases 案例数 | examples | 首个案例时机 |
 |---|---|---|---|---|
+| test-strategy-generator | ✅ 完整 | 0 | ✅（spartans-subscribe 首个） | 下次 QA 修正生成的策略文档 |
 | testcase-generator | ✅ 完整 | **1**（V5 并发订阅双扣） | ✅ | 已有 |
 | bug-writer | ✅ 完整 | 0 | ⏳ 待补 | 下次修正 AI bug 报告 |
 | walkthrough-recorder | ✅ 完整 | 0 | ⏳ 待补 | 下次整理走查笔记 |
@@ -28,7 +30,8 @@
 
 | 你在做什么 | 用哪个 |
 |---|---|
-| 收到 PRD 或看完新功能 | `walkthrough-recorder`（先走查）→ `testcase-generator`（生用例）|
+| 收到 PRD、开始新功能测试 | `test-strategy-generator`（先出策略） → `testcase-generator`（展开用例）|
+| 拿到走查/审计报告 | `walkthrough-recorder`（整理） → `test-strategy-generator` → `testcase-generator` |
 | 走查发现了问题 | `bug-writer`（写缺陷）|
 | 收到 PR 通知 | `regression-planner`（列回归清单）|
 | 后端给了新接口 | `api-test-generator`（生接口用例）|

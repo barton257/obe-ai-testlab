@@ -58,6 +58,17 @@ obe-ai-testlab/
 | AI 生成能力本身 | `ai-testlab/` |
 | 一次性小工具 | `scripts/` |
 
+## 测试完整性
+
+新功能落地遵循 **策略 → 用例 → 代码 → 验收** 四阶段：
+
+1. **策略**：用 [`ai-testlab/skills/test-strategy-generator/`](ai-testlab/skills/test-strategy-generator/) 生成 `<功能>_TEST_STRATEGY.md`（六问 + 场景矩阵 + 六层测试 + 非功能维度）
+2. **用例**：用 [`testcase-generator`](ai-testlab/skills/testcase-generator/) 展开 YAML 用例
+3. **代码**：用 [`api-test-generator`](ai-testlab/skills/api-test-generator/) 生成 pytest；UI E2E 手写 Playwright；压测手写 k6
+4. **验收**：对照 [`shared/conventions/dod.md`](shared/conventions/dod.md) 打勾
+
+首个完整示例：[`projects/spartans/docs/SPARTANS_SUBSCRIBE_TEST_STRATEGY.md`](projects/spartans/docs/SPARTANS_SUBSCRIBE_TEST_STRATEGY.md)。
+
 ## 快速上手
 
 ```bash
@@ -65,8 +76,15 @@ git clone git@github-barton257:barton257/obe-ai-testlab.git
 cd obe-ai-testlab
 # 阅读顺序
 cat AGENTS.md                         # 协作规范
+cat shared/conventions/dod.md         # 上线闸
 cat projects/spartans/README.md       # 业务入口
 cat ai-testlab/README.md              # AI 能力入口
+
+# 运行 spartans API smoke
+uv venv --python 3.13 .venv && source .venv/bin/activate
+uv pip install -r requirements-dev.txt
+cp shared/secrets/spartans.example.env .env.local  # 填真值
+pytest projects/spartans/tests/api/ -v -m "not e2e"
 ```
 
 ## 相关

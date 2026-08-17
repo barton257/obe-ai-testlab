@@ -22,3 +22,13 @@ __pycache__/
 .env.local
 *.env.local
 shared/secrets/*.env.local
+
+# Playwright storage state
+projects/**/tests/e2e/.auth/
+projects/**/tests/e2e/playwright-report/
+projects/**/tests/e2e/test-results/
+
+# Node.js (Playwright)
+projects/**/tests/e2e/node_modules/
+projects/**/tests/e2e/package-lock.json
+projects/**/tests/e2e/.claude/
