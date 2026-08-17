@@ -1,0 +1,62 @@
+# SPARTANS Tier 参数基线（2026-08-17 用户口径：临时全部一致）
+# 更新此文件的规则：运营调整任一 Tier 参数后同步；每次更新在 commit message 注明来源
+
+tiers:
+  - level: 1
+    min_subscribe: 1
+    max_subscribe: 100000000
+    aum_cap: 100000000
+    bot_limit: null       # 待补
+    profit_share_default: 10.0
+  - level: 2
+    min_subscribe: 1
+    max_subscribe: 100000000
+    aum_cap: 100000000
+    bot_limit: null
+    profit_share_default: 10.0
+  - level: 3
+    min_subscribe: 1
+    max_subscribe: 100000000
+    aum_cap: 100000000
+    bot_limit: null
+    profit_share_default: 10.0
+  - level: 4
+    min_subscribe: 1
+    max_subscribe: 100000000
+    aum_cap: 100000000
+    bot_limit: null
+    profit_share_default: 10.0
+  - level: 5
+    min_subscribe: 1
+    max_subscribe: 100000000
+    aum_cap: 100000000
+    bot_limit: null
+    profit_share_default: 10.0
+
+batch_windows:
+  testnet:
+    subscribe_secs: 600     # 10 min
+    redeem_secs: 600        # 10 min
+  production:
+    subscribe_secs: 3600    # 1 hour
+    redeem_secs: 3600       # 1 hour
+
+known_bots_testnet:
+  - id: 1342
+    alias: Kakarotto
+    status: Running
+    strategy_type: Aggressive
+    profit_share_ratio: 10
+  - id: 1345
+    alias: Vegeta
+    status: Running
+    strategy_type: null
+    profit_share_ratio: 10
+  - id: 1344
+    alias: Frieza
+    status: Running
+    profit_share_ratio: 10
+  - id: 1338
+    alias: FEN-0807
+    status: Running
+    profit_share_ratio: 10

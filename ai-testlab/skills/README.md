@@ -20,7 +20,7 @@
 | bug-writer | ✅ 完整 | 0 | ⏳ 待补 | 下次修正 AI bug 报告 |
 | walkthrough-recorder | ✅ 完整 | 0 | ⏳ 待补 | 下次整理走查笔记 |
 | regression-planner | ✅ 完整 | 0 | ⏳ 待补 | 2026-08-27 上线后复盘 |
-| api-test-generator | ⏳ 待补 prompt | 0 | ⏳ 待补 | 有 OpenAPI 接入后 |
+| api-test-generator | ✅ 完整 | 0 | ⏳ 待补 | 下次生成新接口测试或对 `test_spartans_api.py` 做回归实验 |
 
 ## 触发场景速查
 
