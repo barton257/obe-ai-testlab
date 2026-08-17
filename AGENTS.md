@@ -2,6 +2,57 @@
 
 本仓库由多个 AI 工具协作维护（Claude Code、Codex、Cursor 等）。**所有 AI 在写入或修改文件前必须先阅读本文件**。
 
+## 〇、两轴关系图（最容易混的一处）
+
+仓库沿**两条正交的轴**组织：**业务产物** vs **通用能力/工具**。搞清楚坐标再动手。
+
+```
+                    通用能力 / 工具（跨业务复用）
+                    ▲
+                    │
+       automation/ ─┼─  ai-testlab/
+       测试框架     │   AI 生产工具
+       客户端/CI    │   skills/prompts/templates
+                    │
+   跨业务 ─────────┼──────────── 业务专属
+                    │
+       shared/     │    projects/<业务>/
+       术语/规范    │    docs/maps/testcases/bugs/tests
+                    │
+                    ▼
+                    业务产物（具体交付物）
+```
+
+### `projects/` 与 `ai-testlab/` 的生产关系
+
+`ai-testlab/` 是**工厂**，`projects/` 是**仓库**。
+
+```
+输入                    ai-testlab/(工具)              projects/<业务>/(产物)
+──────────────────    ──────────────────────────    ──────────────────────────
+docs/*.md         →   skills/testcase-generator  →  testcases/*.yaml
+现象/日志         →   skills/bug-writer          →  bugs/*.md
+OpenAPI           →   skills/api-test-generator  →  tests/api/*.py
+变更点            →   skills/regression-planner  →  docs/regression-*.md
+走查录音/截图     →   skills/walkthrough-recorder →  docs/*_WALKTHROUGH.md
+```
+
+判断口诀：
+
+- **一个 prompt / 模板 / 生成规则** ≥ 2 个业务能用 → `ai-testlab/skills/`
+- **一份具体的用例 / bug / 报告** → `projects/<业务>/`
+- **一个客户端 / 页面对象 / CI 定义** 多业务共用 → `automation/`
+- **一个业务专属角色 prompt** → `projects/<业务>/bots/`
+
+四个顶层目录再对照：
+
+| 轴 | 目录 | 一句话定义 |
+|---|---|---|
+| 业务产物 | `projects/` | 各业务的走查、用例、缺陷、测试脚本 |
+| 通用工具 | `ai-testlab/` | 生成产物的 AI 技能 / prompt / 模板 |
+| 通用工具 | `automation/` | 测试运行时依赖的框架代码 |
+| 跨业务规范 | `shared/` | 术语、环境、密钥示例、规则约定 |
+
 ## 一、写入前四问
 
 1. **它属于哪个业务？** 有业务字眼 → `projects/<业务>/`；跨业务通用 → `automation/` 或 `shared/`；是 AI 能力本身 → `ai-testlab/`。
