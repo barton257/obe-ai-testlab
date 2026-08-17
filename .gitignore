@@ -1,0 +1,13 @@
+# 排除内嵌的独立仓库（已在 HenrlyLin16/obe-ai-product-workflow 单独维护）
+obe-ai-product-workflow/
+
+# macOS
+.DS_Store
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# Claude Code 本地设置
+.claude/settings.local.json
