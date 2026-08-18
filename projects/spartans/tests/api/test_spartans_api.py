@@ -35,6 +35,46 @@ def client() -> SpartansClient:
     return SpartansClient(ObeClient.from_env())
 
 
+# 动账用例专用：走 FUNDS 账户，避免污染 User1 并便于资金台账对账
+FUNDS_MIN_BALANCE = float(os.environ.get("FUNDS_MIN_BALANCE", "50"))
+
+
+@pytest.fixture(scope="module")
+def funds_client() -> SpartansClient:
+    """专用资金账户客户端（UID 见 .env.local 的 FUNDS_UID）。
+
+    余额低于阈值直接 skip，而不是跑到一半失败 —— 失败原因会指向业务断言，
+    掩盖"其实是没钱了"这个真实原因。
+
+    ⚠️ 用本 fixture 的用例都会真实动账，跑完必须同步台账：
+        python scripts/spartans_funds_ledger.py sync
+    """
+    token = os.environ.get("FUNDS_AUTH_TOKEN")
+    if not token:
+        pytest.skip("FUNDS_AUTH_TOKEN 未配置，见 projects/spartans/funds/README.md")
+
+    c = SpartansClient(ObeClient(
+        base_url=os.environ["SPARTANS_API_BASE"],
+        token=token,
+        identify=os.environ.get("AUTH_IDENTIFY", ""),
+        frontend_origin=os.environ.get("SPARTANS_FRONTEND_BASE", ""),
+    ))
+    avail = float(c.user_summary()["data"]["availableBalance"])
+    if avail < FUNDS_MIN_BALANCE:
+        pytest.skip(
+            f"资金账户余额不足：{avail} < {FUNDS_MIN_BALANCE} USDT，需补充后再跑"
+        )
+    return c
+
+
+@pytest.fixture(scope="module")
+def funds_uid() -> str:
+    uid = os.environ.get("FUNDS_UID")
+    if not uid:
+        pytest.skip("FUNDS_UID 未配置")
+    return uid
+
+
 # ── 只读 smoke ────────────────────────────────────────────────────────────────
 
 class TestSmokeReadOnly:
@@ -53,7 +93,11 @@ class TestSmokeReadOnly:
     def test_bot_detail_kakarotto(self, client):
         data = client.bot_detail(BOT_ALIAS)["data"]
         assert data["nameAlias"] == BOT_ALIAS
-        assert data["status"] == "Running"
+        # 不写死 Running：bot 在批次结算窗口内会短暂变 Settling，属正常状态机。
+        # 2026-08-18 实测该用例因此偶发失败（断言 Running 但实际 Settling）。
+        assert data["status"] in ("Running", "Settling"), (
+            f"bot 状态异常: {data['status']}"
+        )
         assert "profitShareRatio" in data
         assert "aum" in data and data["aum"] >= 0
 
@@ -204,13 +248,13 @@ class TestSubscribeRedeemE2E:
     正确跑法：pytest projects/spartans/tests/api/test_spartans_api.py -m writes_funds -v
     """
 
-    def test_purchase_min_amount(self, client):
-        resp = client.purchase(USER1_ID, BOT_ID, SUBSCRIBE_MIN)
+    def test_purchase_min_amount(self, funds_client, funds_uid):
+        resp = funds_client.purchase(funds_uid, BOT_ID, SUBSCRIBE_MIN)
         assert resp.get("code", 0) == 0
         assert resp.get("msg") == "success"
 
-    def test_purchase_appears_in_history(self, client):
-        history = client.invest_history(USER1_ID, limit=1)["data"]["bots"]
+    def test_purchase_appears_in_history(self, funds_client, funds_uid):
+        history = funds_client.invest_history(funds_uid, limit=1)["data"]["bots"]
         assert len(history) >= 1
         latest = history[0]
         assert latest["botId"] == BOT_ID
@@ -225,11 +269,11 @@ class TestSubscribeRedeemE2E:
         print(f"\n等待批次处理，最长 {BATCH_WINDOW}s ...")
         time.sleep(BATCH_WINDOW)
 
-    def test_redeem_min_amount(self, client):
-        resp = client.redeem(USER1_ID, BOT_ID, SUBSCRIBE_MIN)
+    def test_redeem_min_amount(self, funds_client, funds_uid):
+        resp = funds_client.redeem(funds_uid, BOT_ID, SUBSCRIBE_MIN)
         assert resp.get("msg") == "success"
 
-    def test_redeem_appears_in_history(self, client):
-        history = client.invest_history(USER1_ID, limit=1)["data"]["bots"]
+    def test_redeem_appears_in_history(self, funds_client, funds_uid):
+        history = funds_client.invest_history(funds_uid, limit=1)["data"]["bots"]
         assert history[0]["tradeType"] == "Redeem"
         assert history[0]["botId"] == BOT_ID
