@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import requests
+from urllib3.util.retry import Retry
 
 
 class ObeApiError(RuntimeError):
@@ -35,6 +36,25 @@ class ObeClient:
 
     def __post_init__(self) -> None:
         self._s = requests.Session()
+
+        # Testnet 网关偶发在 TLS 握手阶段断连（SSLEOFError / ERR_CONNECTION_CLOSED），
+        # 实测同一批只读用例连续三轮里第一轮挂 test_bot_summary，后两轮全绿。
+        #
+        # ⚠️ 只重试 connect 阶段，read/status 一律不重试：
+        #    连接尚未建立 ⇒ 请求肯定没到服务端 ⇒ 重试不会重复下单。
+        #    一旦请求已发出（read 阶段超时），重试 POST /invest/purchase
+        #    可能造成重复扣款，所以 read=0、status=0 必须保持。
+        retry = Retry(
+            total=None,
+            connect=2,
+            read=0,
+            status=0,
+            backoff_factor=0.5,
+        )
+        adapter = requests.adapters.HTTPAdapter(max_retries=retry)
+        self._s.mount("https://", adapter)
+        self._s.mount("http://", adapter)
+
         self._s.headers.update({
             "authorization": f"Bearer {self.token}",
             "identify": self.identify,
