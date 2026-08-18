@@ -50,8 +50,7 @@ tests/e2e/
 ├── .auth/
 │   └── user1.json                   认证状态（gitignore）
 ├── fixtures/
-│   ├── auth.ts                      [已废弃] JWT fixture 方案
-│   ├── login.ts                     登录辅助函数
+│   ├── login.ts                     登录辅助函数（loginViaUI）
 │   └── nav.ts                       gotoWithRetry：连接类错误重试
 ├── subscribe-happy.spec.ts          ✅ 订阅 happy path（P0）
 ├── subscribe-frontend-validation.spec.ts  ✅ 金额校验 5 条（P0）

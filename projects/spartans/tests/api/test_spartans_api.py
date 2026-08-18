@@ -24,7 +24,6 @@ BOT_ID = int(os.environ.get("BOT1_ID", "1342"))
 BOT_ALIAS = "Kakarotto"
 # 下单最小额度；生产测试时可通过环境变量改为其他值
 SUBSCRIBE_MIN = float(os.environ.get("SPARTANS_TEST_MIN_AMOUNT", "1"))
-SUBSCRIBE_MAX = float(os.environ.get("SPARTANS_TEST_MAX_AMOUNT", "10"))
 # Tier 上限基线，与 tests/fixtures/tier_config.yaml 的 max_subscribe 对齐
 SUBSCRIBE_TIER_MAX = float(os.environ.get("SPARTANS_TEST_TIER_MAX", "100000000"))
 BATCH_WINDOW = int(os.environ.get("SPARTANS_BATCH_WINDOW_SECS", "660"))

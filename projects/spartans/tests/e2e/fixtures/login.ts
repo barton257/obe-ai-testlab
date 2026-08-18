@@ -1,8 +1,9 @@
 /**
  * 通过 UI 登录的通用 helper（含邮箱 OTP，Testnet 固定 123456）。
  *
- * 之所以还留 UI 登录：`fixtures/auth.ts` 是 JWT 注入 cookie 跳过 UI；
- * 但登录流程本身也要被 e2e 覆盖，此 helper 支持 login.spec.ts。
+ * 两个调用方：
+ *   - auth.setup.ts —— 抓 User1 的 storageState，供所有 chromium 用例复用
+ *   - login.spec.ts —— 覆盖登录流程本身（用 User2，见该文件说明）
  */
 import type { Page } from '@playwright/test';
 
