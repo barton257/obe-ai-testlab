@@ -15,11 +15,12 @@
  * 直接 .click() checkbox 不生效，用 setChecked({ force: true }) 走语义化路径。
  */
 import { test, expect, type Page } from '@playwright/test';
+import { gotoWithRetry } from './fixtures/nav';
 
 const BOT_ALIAS = 'Kakarotto';
 
 async function openSubscribeDialog(page: Page) {
-  await page.goto(`/zh-cn/spartan-bot/${BOT_ALIAS}`);
+  await gotoWithRetry(page, `/zh-cn/spartan-bot/${BOT_ALIAS}`);
   await page.getByRole('button', { name: '订阅' }).nth(1).click();
   await page.getByRole('spinbutton', { name: '请输入金额' }).fill('1');
 }

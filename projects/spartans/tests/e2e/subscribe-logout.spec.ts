@@ -6,12 +6,13 @@
  * 探路结论：未登录时 subscribe-happy 第一次跑就弹了登录页 —— 校验此行为。
  */
 import { test, expect } from '@playwright/test';
+import { gotoWithRetry } from './fixtures/nav';
 
 const BOT_ALIAS = 'Kakarotto';
 
 test.describe('未登录订阅', () => {
   test('未登录访问机器人详情页可以浏览但点订阅会跳登录', async ({ page }) => {
-    await page.goto(`/zh-cn/spartan-bot/${BOT_ALIAS}`);
+    await gotoWithRetry(page, `/zh-cn/spartan-bot/${BOT_ALIAS}`);
     // 详情页本身应可见（公开）
     await expect(page.getByRole('heading', { name: BOT_ALIAS })).toBeVisible();
 

@@ -10,6 +10,7 @@
  * 简单文案校验：每种语言下"订阅"按钮文本能被对应正则匹配到。
  */
 import { test, expect } from '@playwright/test';
+import { gotoWithRetry } from './fixtures/nav';
 
 const BOT_ALIAS = 'Kakarotto';
 
@@ -22,12 +23,12 @@ const cases = [
 test.describe('订阅按钮 i18n', () => {
   for (const { locale, urlSeg, label } of cases) {
     test(`${locale} — 详情页显示订阅按钮`, async ({ page }) => {
-      await page.goto(`${urlSeg}/spartan-bot/${BOT_ALIAS}`);
+      await gotoWithRetry(page, `${urlSeg}/spartan-bot/${BOT_ALIAS}`);
       await expect(page.getByRole('button', { name: label }).first()).toBeVisible();
     });
 
     test(`${locale} — 详情页可以打开订阅弹窗`, async ({ page }) => {
-      await page.goto(`${urlSeg}/spartan-bot/${BOT_ALIAS}`);
+      await gotoWithRetry(page, `${urlSeg}/spartan-bot/${BOT_ALIAS}`);
       // 打开订阅弹窗（点第二个订阅按钮），断言金额输入框出现
       await page.getByRole('button', { name: label }).nth(1).click();
       const amountInput = page.locator('input[type=number][placeholder]').first();
