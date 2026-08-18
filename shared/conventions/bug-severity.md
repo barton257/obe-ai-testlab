@@ -120,7 +120,7 @@
 | S3 | P1 或 P2 | 埋雷严重可升 P1 |
 | S4 | P2 或 P3 | 品牌敏感文案可升 P1 |
 
-优先级判定见 [`priority.md`](priority.md)（待补）。
+优先级判定见 [`priority.md`](priority.md)。
 
 ---
 

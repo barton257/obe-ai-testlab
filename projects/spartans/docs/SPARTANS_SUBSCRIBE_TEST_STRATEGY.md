@@ -260,10 +260,22 @@
 - 测试代码：`tests/api/test_spartans_api.py`、`tests/api/client.py`
 - 通用底座：`automation/clients/obe_http.py`
 
-## 待 QA 补充（TODO 项）
+## 待确认项（需外部方拍板）
 
-1. `TODO(产品)`：批次窗口内多次订阅是否合并 or 分记录？
-2. `TODO(后端)`：Tier 参数在哪个配置项，运营改动能否触发 webhook 通知 QA？
-3. `TODO(SRE)`：metric / trace 命名规范
-4. `TODO(产品)`：Private bot 白名单管理入口
-5. `TODO(后端)`：批次失败时的 kafka topic / db 状态
+**状态：全部「待确认」**（2026-08-18 记录，未与产品/后端/SRE 对齐）。
+按 [`priority.md`](../../../shared/conventions/priority.md) §5-D，这些项不阻塞其余用例编写，
+故先标注待确认继续推进；结论回填后需同步更新对应用例。
+
+| # | 问题 | 对接方 | 状态 | 影响的测试范围 |
+|---|---|---|---|---|
+| 1 | 批次窗口内多次订阅是否合并 or 分记录？ | 产品 | 待确认 | 决定"同窗口多次订阅"用例的预期断言。注：已实测"我的订阅→进行中"tab 按 bot 聚合显示累计金额，单条记录只在"操作记录"tab —— 这是 UI 呈现口径，服务端是否合并仍待确认 |
+| 2 | Tier 参数在哪个配置项，运营改动能否触发通知 QA？ | 后端 | 待确认 | `tests/fixtures/tier_config.yaml` 目前是手工基线，运营改动后会静默过期 |
+| 3 | metric / trace 命名规范 | SRE | 待确认 | 可观测性断言无法编写 |
+| 4 | Private bot 白名单管理入口 | 产品 | 待确认 | Private bot 订阅权限用例无法覆盖 |
+| 5 | 批次失败时的 kafka topic / db 状态 | 后端 | 待确认 | 批次回滚用例（roadmap P2-6）缺少验证锚点 |
+
+**另新增一项**（2026-08-18 从用例实现中暴露）：
+
+| # | 问题 | 对接方 | 状态 | 背景 |
+|---|---|---|---|---|
+| 6 | 是否有低 `max_subscribe` 的 Tier 或高余额测试账户？ | 产品/后端 | 待确认 | `tier_config` 的 `max_subscribe=100000000` 远超测试账户余额（约 9.5k），任何超 max 的金额必然先撞 `balance_not_enough`，**无法单独验证 max 校验本身**。见 `test_purchase_above_max_rejected` 的注释 |
