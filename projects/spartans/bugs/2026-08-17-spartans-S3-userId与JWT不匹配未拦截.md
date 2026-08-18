@@ -48,3 +48,58 @@ curl -X POST 'https://bullapitest.1bullex.com/botapi/v1/invest/purchase' \
 
 - 后端在 controller 层加校验：`if body.userId != jwt.api: return code=1, msg="identity_mismatch"`
 - 前端不应显式传 userId，让服务端从 token 推断（当前实现里前端确实传了，见 `invest/purchase.js`）
+
+---
+
+## 复验记录 2026-08-18（Barton，AI 辅助）
+
+**状态：缺陷仍存在，未修复。级别维持 S3。** 后端仓库不在本机，用 Testnet 实调复验。
+
+复验方式与昨天一致 —— 用 User1 token 提交 `body.userId=<User2 UID>`，
+并**分别用两个账号自己的 token 查各自 history**，确认记录归属（这是 S3 与 S1 的分界，必须验证）：
+
+```
+BEFORE  User1 total=52 latest #1838   |  User2 total=12 latest #1759
+提交    User1 token + body.userId=User2(10732177), amount=1
+同步    code=0 msg=success
+AFTER   User1 total=53 latest #1839 amt=1  |  User2 total=12 latest #1759
+        User1 记录数 +1 ; User2 记录数 +0
+```
+
+**结论不变**：服务端以 JWT.api 为唯一操作者，body.userId 被静默忽略。
+User2 侧零变化 —— **不越权，不升级为 S1，S3 维持**。
+
+（User1 total 由 47 增至 52 是同期其他复验与 E2E 用例产生的，与本条无关。）
+
+### 与另两条缺陷的共性
+
+本条与 [S2 订阅金额穿透](2026-08-17-spartans-S2-订阅金额小于最小值未拦截.md)、
+[S2 赎回超权益静默截断](2026-08-17-spartans-S2-赎回金额超权益静默截断.md) 同属
+**"入参越界/非法后静默处理，而非显式拒绝"** 的同一类根因，三条建议一并修复。
+
+差别在于本条**当前不造成用户可感知的错误结果**（记录落对了人），
+所以是埋雷型缺陷：一旦后端某次 refactor 改成"优先信 body.userId"，立刻变高危越权。
+这正是原报告第 3 条理由，复验后依然成立。
+
+### 修复建议（较原建议补充实施路径）
+
+分两步，避免 breaking change：
+
+1. **本迭代**：controller 层加一致性校验，不一致直接拒绝
+
+   ```
+   if body.userId != jwt.api:
+       return {"code": 1, "msg": "identity_mismatch"}
+   ```
+
+   这一步对现有前端**无影响**（前端传的就是自己的 UID，本来就一致）。
+
+2. **下个大版本**：从接口契约里移除 `userId` 字段，服务端只信 token。
+   需前端同步改造（当前 `invest/purchase.js` 确实在传），属 breaking change，
+   不建议与第 1 步同期做。
+
+### 回归用例
+
+`tests/api/test_spartans_api.py::TestKnownDefectRegressions::test_purchase_wrong_user_id_rejected`
+已用 `@pytest.mark.xfail(strict=True)` 标记，2026-08-18 实测为 `XFAIL`（缺陷复现）。
+后端修复后该用例转 XPASS 失败，强制回来摘标记。
