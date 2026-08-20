@@ -4,6 +4,12 @@ obe-ai-product-workflow/
 # macOS
 .DS_Store
 
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
 # 编辑器
 .vscode/
 .idea/
@@ -11,3 +17,18 @@ obe-ai-product-workflow/
 
 # Claude Code 本地设置
 .claude/settings.local.json
+
+# 本地凭证（绝不入库）
+.env.local
+*.env.local
+shared/secrets/*.env.local
+
+# Playwright storage state
+projects/**/tests/e2e/.auth/
+projects/**/tests/e2e/playwright-report/
+projects/**/tests/e2e/test-results/
+
+# Node.js (Playwright)
+projects/**/tests/e2e/node_modules/
+projects/**/tests/e2e/package-lock.json
+projects/**/tests/e2e/.claude/

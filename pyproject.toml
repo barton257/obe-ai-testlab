@@ -1,0 +1,10 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["projects", "automation"]
+markers = [
+    "e2e: 完整链路测试，涉及等待批次窗口",
+    "slow: 单个用例执行时间 > 60s",
+    "writes_funds: 会真实动账（下单/赎回），默认不跑；加 -m writes_funds 显式启用",
+]
+# 默认排除动账用例：目前没有专用资金账户，避免 pytest 全跑就扣款
+addopts = "-ra --strict-markers -m 'not writes_funds'"

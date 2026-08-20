@@ -1,0 +1,2 @@
+time,type,amount,currency,from,to,fee_type,ref_id,bot,balance_after,source,note
+2026-08-18 14:02:24,subscribe,-1.00000000,USDT,available_balance,bot:Kakarotto,,1841,Kakarotto,,api,status=Finished units=1.016023
